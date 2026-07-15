@@ -1,0 +1,10 @@
+sensor_driver:
+  ros__parameters:
+    publish_rate_hz: 50.0
+
+filter_node:
+  ros__parameters:
+    window_size: 20
+
+logger_node:
+  ros__parameters: {}
