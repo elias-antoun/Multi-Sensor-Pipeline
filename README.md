@@ -50,19 +50,43 @@ You should see `sensor_driver` publishing at 50 Hz, `filter_node` printing filte
 
 ## Verify
 
-Check topic frequency (should be ~50 Hz):
+**1. Check topic frequency (should be ~50 Hz):**
 ```bash
 ros2 topic hz /imu/raw
 ```
 
-Check all parameters loaded from YAML:
+**2. Check parameters loaded from YAML:**
 ```bash
 ros2 param list
 ```
-
 You should see all three nodes under `/imu/` with their parameters:
 - `/imu/sensor_driver` → `publish_rate_hz`
 - `/imu/filter_node` → `window_size`
+
+Confirm the actual values match the YAML:
+```bash
+ros2 param get /imu/sensor_driver publish_rate_hz
+ros2 param get /imu/filter_node window_size
+```
+Expected: `50.0` and `20`.
+
+**3. Verify the moving average works by changing window_size at runtime:**
+
+With the pipeline running, open a second terminal and run:
+
+```bash
+# small window — filtered tracks raw closely, diff is small
+ros2 param set /imu/filter_node window_size 3
+```
+Watch the logger output — the difference between raw and filtered accel_x should be very small.
+
+```bash
+# large window — heavy smoothing, filtered responds slowly, diff is large
+ros2 param set /imu/filter_node window_size 50
+```
+The difference should grow noticeably because the filter is now averaging over 50 samples.
+
+This confirms the moving average responds correctly to the parameter — no rebuild needed, just change the value and observe.
 
 ---
 
