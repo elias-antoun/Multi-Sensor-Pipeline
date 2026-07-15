@@ -14,11 +14,13 @@ public:
     declare_parameter<double>("publish_rate_hz", 50.0);
     double rate_hz = get_parameter("publish_rate_hz").as_double();
 
+    auto qos = rclcpp::QoS(rclcpp::KeepLast(20)).reliable();
+
     RCLCPP_INFO(get_logger(), "Sensor driver starting at %.2f Hz", rate_hz);
 
     publisher_ = create_publisher<my_interfaces::msg::ImuReading>(
       "/imu/raw",
-      rclcpp::QoS(10).reliable()
+      qos
     );
 
     auto interval_ms = std::chrono::milliseconds(static_cast<int>(1000.0 / rate_hz));
